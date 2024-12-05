@@ -5,6 +5,7 @@ import Shoulders from './pages/Shoulders';
 import Front from './pages/Front';
 import Back from './pages/Back';
 import Legs from './pages/Legs';
+import Scatter from './pages/Scatter';
 import './Navbar.css'; // Import the CSS file
 
 const App = () => {
@@ -29,6 +30,9 @@ const App = () => {
           <NavLink to="/shoulders" className={({ isActive }) => (isActive ? 'active' : '')}>
             Shoulders
           </NavLink>
+          <NavLink to="/scatter" className={({ isActive }) => (isActive ? 'active' : '')}>
+            Scatter Plot
+          </NavLink>
         </nav>
 
         {/* Routes */}
@@ -38,6 +42,7 @@ const App = () => {
           <Route path="/back" element={<Back />} />
           <Route path="/legs" element={<Legs />} />
           <Route path="/shoulders" element={<Shoulders />} />
+          <Route path="/scatter" element={<Scatter />} />
         </Routes>
       </div>
     </Router>
