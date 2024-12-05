@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import BarChart from '../components/BarChart';
 
-const SHEET_ID = process.env.REACT_APP_SHEET_ID;
-const API_KEY = process.env.REACT_APP_API_KEY;
+const SHEET_ID = process.env.REACT_APP_SHEET_ID; // Hide Sheet ID
+const API_KEY = process.env.REACT_APP_API_KEY;  // Hide API Key
 const SHEET_NAME = 'Shoulders';
 
 const Shoulders = () => {
