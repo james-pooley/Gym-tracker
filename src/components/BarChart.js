@@ -5,13 +5,16 @@ const BarChart = ({ data }) => {
   const svgRef = useRef();
 
   useEffect(() => {
+    // Clear previous chart
+    d3.select(svgRef.current).selectAll('*').remove();
+
+    // Exit early if no data
+    if (!data || data.length === 0) return;
+
     // Set dimensions
     const width = 800;
     const height = 400;
     const margin = { top: 20, right: 130, bottom: 80, left: 50 };
-
-    // Clear previous content
-    d3.select(svgRef.current).selectAll('*').remove();
 
     // Create SVG container
     const svg = d3
@@ -24,15 +27,28 @@ const BarChart = ({ data }) => {
     const chartWidth = width - margin.left - margin.right;
     const chartHeight = height - margin.top - margin.bottom;
 
-    // Parse the data
+    // Create tooltip
+    const tooltip = d3
+      .select('body')
+      .append('div')
+      .style('position', 'absolute')
+      .style('background', 'rgba(0, 0, 0, 0.7)')
+      .style('color', 'white')
+      .style('padding', '5px 10px')
+      .style('border-radius', '5px')
+      .style('pointer-events', 'none')
+      .style('opacity', 0);
+
+    // Parse data
     const parsedData = data.map((d) => ({
       date: new Date(d.date),
       exercise: d.exercise,
       weight: +d.weight,
+      reps: +d.reps,
     }));
 
-    // Get unique dates
     const uniqueDates = [...new Set(parsedData.map((d) => d.date))];
+    const groupedData = d3.group(parsedData, (d) => d.date);
 
     // Set scales
     const xScale = d3
@@ -48,7 +64,7 @@ const BarChart = ({ data }) => {
 
     const colorScale = d3
       .scaleOrdinal()
-      .domain([...new Set(parsedData.map((d) => d.exercise))])
+      .domain([...new Set(data.map((d) => d.exercise))])
       .range(d3.schemeCategory10);
 
     // Add X axis
@@ -63,10 +79,7 @@ const BarChart = ({ data }) => {
     // Add Y axis
     svg.append('g').call(d3.axisLeft(yScale));
 
-    // Group data by date for grouped bar chart
-    const groupedData = d3.group(parsedData, (d) => d.date);
-
-    // Add columns
+    // Add bars with tooltip
     groupedData.forEach((sets, date) => {
       const dateX = xScale(date);
 
@@ -77,7 +90,27 @@ const BarChart = ({ data }) => {
           .attr('y', yScale(set.weight))
           .attr('width', xScale.bandwidth() / sets.length)
           .attr('height', chartHeight - yScale(set.weight))
-          .attr('fill', colorScale(set.exercise));
+          .attr('fill', colorScale(set.exercise))
+          .on('mouseover', (event, d) => {
+            tooltip
+              .style('opacity', 1)
+              .html(
+                `<strong>Exercise:</strong> ${set.exercise}<br>
+                <strong>Weight:</strong> ${set.weight} kg<br>
+                <strong>Reps:</strong> ${set.reps}<br>
+                <strong>Date:</strong> ${d3.timeFormat('%Y-%m-%d')(date)}`
+              )
+              .style('left', `${event.pageX + 10}px`)
+              .style('top', `${event.pageY - 20}px`);
+          })
+          .on('mousemove', (event) => {
+            tooltip
+              .style('left', `${event.pageX + 10}px`)
+              .style('top', `${event.pageY - 20}px`);
+          })
+          .on('mouseout', () => {
+            tooltip.style('opacity', 0);
+          });
       });
     });
 
@@ -87,10 +120,7 @@ const BarChart = ({ data }) => {
       .data(colorScale.domain())
       .enter()
       .append('g')
-      .attr(
-        'transform',
-        (_, i) => `translate(${chartWidth + 20}, ${i * 20})`
-      );
+      .attr('transform', (_, i) => `translate(${chartWidth + 20}, ${i * 20})`);
 
     legend
       .append('rect')
@@ -104,6 +134,11 @@ const BarChart = ({ data }) => {
       .attr('y', 10)
       .text((d) => d)
       .style('font-size', '12px');
+
+    // Cleanup tooltip on unmount
+    return () => {
+      tooltip.remove();
+    };
   }, [data]);
 
   return <svg ref={svgRef} />;

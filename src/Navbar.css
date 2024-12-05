@@ -1,0 +1,32 @@
+.navbar {
+    background-color: #282c34;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-evenly; /* Evenly distributes space between links */
+    align-items: center;
+  }
+  
+  .navbar a {
+    padding: 0 20px; /* Adds padding inside the clickable area */
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: bold;
+    transition: color 0.3s ease;
+  }
+  
+  
+  .navbar a:hover {
+    color: #61dafb; /* Change color on hover */
+  }
+  
+  .navbar a.active {
+    border-bottom: 2px solid #61dafb; /* Highlight active link */
+  }
+  
+  .navbar-title {
+    font-size: 24px; /* Larger font for title */
+    color: #61dafb; /* Accent color */
+    margin-right: auto; /* Push links to the right */
+  }
+  
